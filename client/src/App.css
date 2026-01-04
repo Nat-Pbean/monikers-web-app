@@ -1,0 +1,238 @@
+/* --- 1. GLOBAL RESET & MOBILE LOCKDOWN --- */
+:root {
+  --primary: #2196F3;
+  --success: #4CAF50;
+  --danger: #ff4444;
+  --warning: #FF9800;
+  --dark: #333333;
+  --light-gray: #f4f4f9;
+  --border: #dddddd;
+  --shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* Removes blue flash on tap in iOS */
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  position: fixed; /* Prevents "rubber-banding" scroll on iOS */
+  overflow: hidden;
+  background-color: var(--light-gray);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--dark);
+}
+
+/* --- 2. LAYOUT ARCHITECTURE --- */
+.App {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh; /* Modern mobile height */
+  min-height: -webkit-fill-available;
+}
+
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: 20px;
+}
+
+/* Header & Footer */
+.header-bar {
+  flex-shrink: 0;
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.footer-bar {
+  flex-shrink: 0;
+  background: white;
+  border-top: 1px solid var(--border);
+  padding: 15px 15px calc(15px + env(safe-area-inset-bottom));
+  z-index: 100;
+}
+
+/* --- 3. UI COMPONENTS --- */
+
+/* Buttons */
+button {
+  font-family: inherit;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.2s;
+}
+
+button:active {
+  transform: scale(0.96); /* Tactile press effect */
+}
+
+button:disabled {
+  background-color: #ccc !important;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.primary-btn {
+  background-color: var(--primary);
+  color: white;
+  width: 100%;
+  font-size: 1.1rem;
+}
+
+.exit-btn {
+  background-color: var(--danger);
+  color: white;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+/* Inputs */
+input {
+  width: 100%;
+  padding: 14px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 16px; /* Prevents iOS auto-zoom on focus */
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* --- 4. GAME SPECIFIC STYLES --- */
+
+/* Scoreboard */
+.scoreboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--dark);
+  color: white;
+  font-size: 0.9rem;
+}
+
+.timer {
+  font-size: 1.4rem;
+  background: rgba(255,255,255,0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.timer.low {
+  color: #ff8888;
+  animation: blink 1s infinite;
+}
+
+/* Grid Layout for Drafting */
+.scroll-area {
+  flex: 1; /* Take up all available space */
+  overflow-y: auto; /* Allow vertical scrolling */
+  -webkit-overflow-scrolling: touch; /* Momentum scrolling for iOS */
+  padding: 15px;
+  
+  /* Critical: ensure the content doesn't get hidden behind the fixed footer */
+  display: block; 
+}
+
+.draft-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Fill the App container */
+  overflow: hidden; /* Prevent the container itself from scrolling */
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding-bottom: 20px; /* Extra space so the last card isn't cut off */
+}
+
+.card-item {
+  background: white;
+  border: 1px solid var(--border);
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.card-item.selected {
+  border: 3px solid var(--success);
+  background: #f0fff0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.card-item b {
+  font-size: 1rem;
+  color: var(--dark);
+}
+
+.card-item p {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Gameplay Card (The big one) */
+.card-main {
+  background: white;
+  border-radius: 20px;
+  padding: 40px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  margin-bottom: 30px;
+}
+
+.card-main h1 {
+  font-size: 2.2rem;
+  margin: 0 0 15px 0;
+}
+
+.action-btns {
+  display: flex;
+  gap: 15px;
+}
+
+.pass-btn { background: var(--warning); color: white; flex: 1; }
+.score-btn { background: var(--success); color: white; flex: 1; }
+
+/* --- 5. ANIMATIONS --- */
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+/* Helper for centering login/lobby */
+.screen-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  gap: 20px;
+  padding: 30px;
+}
